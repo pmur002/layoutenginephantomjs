@@ -1,0 +1,10 @@
+Package: layoutEnginePhantomJS
+Type: Package
+Title: Render HTML Using PhantomJS
+Version: 0.1-0
+Author: Paul Murrell
+Maintainer: Paul Murrell <paul@stat.auckland.ac.nz>
+Description: A "backend" package for 'layoutEngine' that is based on 
+             PhantomJS.
+Depends: layoutEngine
+License: GPL-3
