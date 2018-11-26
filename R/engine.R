@@ -63,13 +63,14 @@ phantomjsLayout <- function(html, width, height, fonts, device) {
                              package="layoutEnginePhantomJS"),
                  htmlfile, outfile))
     layoutDF <- read.csv(outfile, header=FALSE, stringsAsFactors=FALSE,
+                         strip.white=TRUE,
                          ## PhantomJS puts single quotes around font family
                          ## names that contain spaces (?)
                          quote="'")
     ## Convert font size from CSS pixels to points
     layoutDF[, 10] <- layoutDF[, 10]*72/dpi
     ## Break text if necessary
-    do.call(makeLayout, unname(splitLines(layoutDF[1:10])))
+    do.call(makeLayout, unname(splitLines(layoutDF)))
 }
 
 phantomjsEngine <- makeEngine(phantomjsLayout)
