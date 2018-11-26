@@ -68,7 +68,7 @@ phantomjsLayout <- function(html, width, height, fonts, device) {
                          ## names that contain spaces (?)
                          quote="'")
     ## Convert font size from CSS pixels to points
-    layoutDF[, 10] <- layoutDF[, 10]*72/dpi
+    layoutDF[, 11] <- layoutDF[, 11]*72/dpi
     ## Break text if necessary
     do.call(makeLayout, unname(splitLines(layoutDF)))
 }

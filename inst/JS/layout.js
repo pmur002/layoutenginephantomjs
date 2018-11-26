@@ -1,12 +1,30 @@
 
+// Use element 'id' if that exists, 
+// otherwise, element tag name plus child index
+function elementName(node, index, parentName) {
+    var tagName = node.nodeName;
+    var id = node.getAttribute("id");
+    if (id != null) {
+        return parentName + "." + tagName + "." + id;
+    } else {
+        return parentName + "." + tagName + "." + index;
+    }
+}
+
+function textName(index, parentName) {
+    return parentName + ".TEXT." + index;
+}
+
 function borderWidth(style, border) {
     return style[border].replace("px", "");
 }
 
-function writeBox(node) {
+function writeBox(node, index, parentName) {
     var line = "";
     if (node.nodeType == Node.ELEMENT_NODE) {
         line = line + node.nodeName + ",";
+        var elName = elementName(node, index, parentName);
+        line = line + elName + ",";
         var bbox = node.getBoundingClientRect();
         line = line + bbox.left + ",";
         line = line + bbox.top + ",";
@@ -27,11 +45,12 @@ function writeBox(node) {
         var i;
         var children = node.childNodes;
         for (i=0; i<children.length; i++) {
-            line = line + writeBox(children[i]);
+            line = line + writeBox(children[i], i + 1, elName);
         }
     } else if (node.nodeType == Node.TEXT_NODE &&
                !/^\s*$/.test(node.nodeValue)) {
         line = line + "TEXT,";
+        line = line + textName(index, parentName) + ",";
         // Use document.createRange(), Range.selectNodeContents(<text node>),
         // and Range.getBoundingClientRect() ?
         // as per https://stackoverflow.com/questions/6961022/measure-bounding-box-of-text-node-in-javascript
@@ -68,12 +87,12 @@ function writeBox(node) {
 
 function calculateLayout() {
     var body = document.body;
-    var csv = "BODY," + 0 + "," + 0 + "," + 
+    var csv = "BODY,BODY.1," + 0 + "," + 0 + "," + 
         body.offsetWidth + "," + body.offsetHeight + "\n";
     var i;
     var children = body.childNodes;
     for (i=0; i<children.length; i++) {
-        csv = csv + writeBox(children[i]);
+        csv = csv + writeBox(children[i], i + 1, "BODY.1");
     }
     return csv;
 }
