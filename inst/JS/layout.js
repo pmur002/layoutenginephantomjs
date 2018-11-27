@@ -19,6 +19,22 @@ function borderWidth(style, border) {
     return style[border].replace("px", "");
 }
 
+function hexColor(rgb) {
+    var pieces = rgb.split(/[,()]/);
+    var red = Number(pieces[1]).toString(16);
+    if (red.length < 2) red = "0" + red;
+    var green = Number(pieces[2]).toString(16);
+    if (green.length < 2) green = "0" + green;
+    var blue = Number(pieces[3]).toString(16);
+    if (blue.length < 2) blue = "0" + blue;
+    var alpha = "FF";
+    if (pieces.length > 5) {
+        alpha = Number(pieces[4]).toString(16);
+        if (alpha.length < 2) alpha = "0" + alpha;
+    }
+    return "#" + red + blue + green + alpha;
+}
+
 function writeBox(node, index, parentName) {
     var line = "";
     if (node.nodeType == Node.ELEMENT_NODE) {
@@ -30,16 +46,23 @@ function writeBox(node, index, parentName) {
         line = line + bbox.top + ",";
         line = line + bbox.width + ",";
         line = line + bbox.height + ",";
-        // No text information (text, family, bold, italic, size)
-        line = line + "NA,NA,NA,NA,NA" + ",";
-        // affectsDisplay not available
-        line = line + "NA" + ",";
-        // Borders
+        // No text information (text, family, bold, italic, size, color)
+        line = line + "NA,NA,NA,NA,NA,NA" + ",";
         var style = window.getComputedStyle(node);
+        line = line + hexColor(style["background-color"]) + ",";
+        // Borders
         line = line + borderWidth(style, "border-left-width") + ",";
         line = line + borderWidth(style, "border-top-width") + ",";
         line = line + borderWidth(style, "border-right-width") + ",";
-        line = line + borderWidth(style, "border-bottom-width");
+        line = line + borderWidth(style, "border-bottom-width") + ",";
+        line = line + style["border-left-style"] + ",";
+        line = line + style["border-top-style"] + ",";
+        line = line + style["border-right-style"] + ",";
+        line = line + style["border-bottom-style"] + ",";
+        line = line + hexColor(style["border-left-color"]) + ",";
+        line = line + hexColor(style["border-top-color"]) + ",";
+        line = line + hexColor(style["border-right-color"]) + ",";
+        line = line + hexColor(style["border-bottom-color"]);
         line = line + "\n";
         // console.log(line);
         var i;
@@ -67,16 +90,19 @@ function writeBox(node, index, parentName) {
         line = line + bbox.width + ",";
         line = line + bbox.height + ",";
         // Text 
-        line = line + node.nodeValue + ",";
+        line = line + "'" + node.nodeValue + "'" + ",";
         var style = window.getComputedStyle(parent);
         line = line + style["font-family"] + ",";
         line = line + ((style["font-weight"] == "bold" ||
                         style["font-weight"] > 500)?"TRUE":"FALSE") + ",";
         line = line + ((style["font-style"] != "normal")?"TRUE":"FALSE") + ",";
         line = line + style["font-size"].replace("px", "") + ",";
-        // affectsDisplay not used
-        line = line + "NA" + ",";
-        // No border properties
+        line = line + hexColor(style["color"]) + ",";
+        // No background
+        line = line + "NA,";
+        // No border properties (width, style, color)
+        line = line + "NA,NA,NA,NA,";
+        line = line + "NA,NA,NA,NA,";
         line = line + "NA,NA,NA,NA";
         line = line + "\n";
     } else {

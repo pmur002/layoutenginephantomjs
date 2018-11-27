@@ -66,7 +66,7 @@ phantomjsLayout <- function(html, width, height, fonts, device) {
                          strip.white=TRUE,
                          ## PhantomJS puts single quotes around font family
                          ## names that contain spaces (?)
-                         quote="'")
+                         quote="'\"")
     ## Convert font size from CSS pixels to points
     layoutDF[, 11] <- layoutDF[, 11]*72/dpi
     ## Break text if necessary
