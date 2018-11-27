@@ -8,4 +8,5 @@ Description: A "backend" package for 'layoutEngine' that is based on
              PhantomJS.
 Depends: layoutEngine
 SystemRequirements: PhantomJS
+Suggests: gyre, xtable
 License: GPL-3
