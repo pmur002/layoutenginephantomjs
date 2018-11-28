@@ -2,12 +2,23 @@
 ## CSS standard says 1px = 1/96in !?
 dpi <- 96
 
-breakText <- function(text, family, face, size, width) {
-    ## Have to split the text ourselves if necessary
+breakText <- function(text, family, bold, italic, size, width) {
+
+    if (is.na(text) || nchar(text) == 0)
+        return(NA)
+    
     ## THIS IS VERY ROUGH
+    face <- 1
+    if (bold) {
+        face <- face + 1
+    }
+    if (italic) {
+        face <- face + 2
+    }
     pushViewport(viewport(gp=gpar(fontfamily=family, fontface=face,
                                   fontsize=size)))
-    words <- strsplit(text, " ")[[1]]
+    ## Remove leading/trailing white space
+    words <- strsplit(gsub("^ +| +$", "", text), " ")[[1]]
     if (length(words )== 1) {
         finaltext <- text
     } else {
@@ -20,7 +31,7 @@ breakText <- function(text, family, face, size, width) {
             ## Nasty fudge factor based on values being rounded to nearest
             ## pixel (when PhantomJS works out its layout) 
             if (convertWidth(stringWidth(attempt), "in",
-                             valueOnly=TRUE) <= width + dpi/2) {
+                             valueOnly=TRUE) <= width + 1.5/dpi) {
                 ## If there is room, add space then word to current line
                 linetext <- attempt
             } else {
@@ -37,6 +48,12 @@ breakText <- function(text, family, face, size, width) {
 }
 
 splitLines <- function(layout) {
+    splitText <- mapply(breakText,
+                        text=layout[,7], family=layout[,8],
+                        bold=layout[,9], italic=layout[,10],
+                        size=layout[,11], width=layout[,5]/dpi,
+                        USE.NAMES=FALSE, SIMPLIFY=FALSE)
+    layout[,7] <- unlist(splitText)
     layout
 }
 
