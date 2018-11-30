@@ -2,61 +2,6 @@
 ## CSS standard says 1px = 1/96in !?
 dpi <- 96
 
-breakText <- function(text, family, bold, italic, size, width) {
-
-    if (is.na(text) || nchar(text) == 0)
-        return(NA)
-    
-    ## THIS IS VERY ROUGH
-    face <- 1
-    if (bold) {
-        face <- face + 1
-    }
-    if (italic) {
-        face <- face + 2
-    }
-    pushViewport(viewport(gp=gpar(fontfamily=family, fontface=face,
-                                  fontsize=size)))
-    ## Remove leading/trailing white space
-    words <- strsplit(gsub("^ +| +$", "", text), " ")[[1]]
-    if (length(words )== 1) {
-        finaltext <- text
-    } else {
-        spaceWidth <- convertWidth(stringWidth(" "), "in", valueOnly=TRUE)
-        finaltext <- ""
-        linetext <- words[1]
-        index <- 2
-        while (index <= length(words)) {
-            attempt <- paste(linetext, words[index])
-            ## Nasty fudge factor based on values being rounded to nearest
-            ## pixel (when PhantomJS works out its layout) 
-            if (convertWidth(stringWidth(attempt), "in",
-                             valueOnly=TRUE) <= width + 1.5/dpi) {
-                ## If there is room, add space then word to current line
-                linetext <- attempt
-            } else {
-                ## Otherwise save current line and start new line 
-                finaltext <- paste0(finaltext, linetext, "\n")
-                linetext <- words[index]
-            }
-            index <- index + 1
-        }
-        finaltext <- paste0(finaltext, linetext)
-    }
-    popViewport()
-    finaltext
-}
-
-splitLines <- function(layout) {
-    splitText <- mapply(breakText,
-                        text=layout[,7], family=layout[,8],
-                        bold=layout[,9], italic=layout[,10],
-                        size=layout[,11], width=layout[,5]/dpi,
-                        USE.NAMES=FALSE, SIMPLIFY=FALSE)
-    layout[,7] <- unlist(splitText)
-    layout
-}
-
 phantomjsLayout <- function(html, width, height, fonts, device) {
     ## Work in temp directory
     wd <- file.path(tempdir(), "PhantomJS")
@@ -96,7 +41,7 @@ phantomjsLayout <- function(html, width, height, fonts, device) {
     ## Convert font size from CSS pixels to points
     layoutDF[, 11] <- layoutDF[, 11]*72/dpi
     ## Break text if necessary
-    do.call(makeLayout, unname(splitLines(layoutDF)))
+    do.call(makeLayout, unname(layoutDF))
 }
 
 phantomjsEngine <- makeEngine(phantomjsLayout)

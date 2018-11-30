@@ -35,9 +35,53 @@ function hexColor(rgb) {
     return "#" + red + blue + green + alpha;
 }
 
+// Add <span/> wrapper on all text nodes
+function getTextNodes(parent) {
+    var textNodes = [];
+    for (parent = parent.firstChild; parent; parent = parent.nextSibling) {
+	if (['SCRIPT','STYLE'].indexOf(parent.tagName) >= 0) 
+            continue;
+	if (parent.nodeType === Node.TEXT_NODE) 
+            textNodes.push(parent);
+	else 
+            textNodes = textNodes.concat(getTextNodes(parent));
+    }
+    return textNodes;
+}
+
+function emptyText(node) {
+    return node.nodeValue.match(/^\s*$/);
+}
+
+function split(node) {
+    return node.nodeValue.split(/\s/);
+}
+
+function spanifyText() {
+    var text = getTextNodes(document.body);
+    var parent, span, overallspan;
+    var i, j;
+    for (i = 0; i < text.length; i++) {
+	var words = split(text[i]);
+        if (!emptyText(text[i]) && words.length > 1) {
+            parent = text[i].parentNode;
+	    overallspan = document.createElement("span");
+            for (j = 0; j < words.length; j++) {
+                span = document.createElement("span");
+                span.appendChild(document.createTextNode(words[j] + " "));
+                overallspan.appendChild(span);
+     	    }
+            parent.replaceChild(overallspan, text[i]);
+        }
+    }
+}
+
 function writeBox(node, index, parentName) {
     var line = "";
-    if (node.nodeType == Node.ELEMENT_NODE) {
+    if (node.nodeType == Node.ELEMENT_NODE &&
+        // Ignore some elements
+        node.nodeName.toUpperCase() != "SCRIPT" &&
+        node.nodeName.toUpperCase() != "STYLE") {
         line = line + node.nodeName + ",";
         var elName = elementName(node, index, parentName);
         line = line + elName + ",";
@@ -74,17 +118,8 @@ function writeBox(node, index, parentName) {
                !/^\s*$/.test(node.nodeValue)) {
         line = line + "TEXT,";
         line = line + textName(index, parentName) + ",";
-        // Use document.createRange(), Range.selectNodeContents(<text node>),
-        // and Range.getBoundingClientRect() ?
-        // as per https://stackoverflow.com/questions/6961022/measure-bounding-box-of-text-node-in-javascript
         var parent = node.parentElement;
-        if (true) {
-            var range = document.createRange();
-            range.selectNodeContents(node);
-            var bbox = range.getBoundingClientRect();
-        } else {
-            var bbox = parent.getBoundingClientRect();
-        }
+        var bbox = parent.getBoundingClientRect();
         line = line + bbox.left + ",";
         line = line + bbox.top + ",";
         line = line + bbox.width + ",";
@@ -113,6 +148,7 @@ function writeBox(node, index, parentName) {
 }
 
 function calculateLayout() {
+    spanifyText();
     var body = document.body;
     var csv = "BODY,BODY.1," + 0 + "," + 0 + "," + 
         body.offsetWidth + "," + body.offsetHeight + "\n";
