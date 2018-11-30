@@ -107,6 +107,7 @@ function writeBox(node, index, parentName) {
         line = line + "\n";
     } else {
         // just a comment;  do nothing
+        // console.log("skipping type " + node.nodeType + " node ...");
     }
     return line;
 }

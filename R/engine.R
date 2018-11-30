@@ -64,6 +64,8 @@ phantomjsLayout <- function(html, width, height, fonts, device) {
         dir.create(wd)
     ## Copy font files
     file.copy(fontFiles(fonts, device), wd)
+    ## Copy any assets
+    copyAssets(html, wd)
     ## Create HTML file
     htmlfile <- tempfile(tmpdir=wd, fileext=".html")
     writeLines(as.character(html), htmlfile)
@@ -75,7 +77,11 @@ phantomjsLayout <- function(html, width, height, fonts, device) {
     Sys.setenv(QT_QPA_PLATFORM="offscreen")
     ## Layout result file
     outfile <- file.path(wd, "layout.csv")
-    system(paste(phantomjs, 
+    debug <- ""
+    if (getOption("layoutEnginePhantomJS.debug")) {
+        debug <- "--debug=true"
+    }
+    system(paste(phantomjs, debug,
                  system.file("JS", "phantomLayout.js",
                              package="layoutEnginePhantomJS"),
                  htmlfile, outfile))
