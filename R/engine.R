@@ -62,10 +62,13 @@ phantomjsLayout <- function(html, width, height, fonts, device) {
     wd <- file.path(tempdir(), "PhantomJS")
     if (!dir.exists(wd))
         dir.create(wd)
+    assetDir <- file.path(wd, "assets")
+    if (!dir.exists(assetDir))
+        dir.create(assetDir)    
     ## Copy font files
-    file.copy(fontFiles(fonts, device), wd)
+    file.copy(fontFiles(fonts, device), assetDir)
     ## Copy any assets
-    copyAssets(html, wd)
+    copyAssets(html, assetDir)
     ## Create HTML file
     htmlfile <- tempfile(tmpdir=wd, fileext=".html")
     writeLines(as.character(html), htmlfile)
