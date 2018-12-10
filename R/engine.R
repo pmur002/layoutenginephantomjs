@@ -16,7 +16,7 @@ phantomjsLayout <- function(html, width, height, fonts, device) {
     copyAssets(html, assetDir)
     ## Create HTML file
     htmlfile <- tempfile(tmpdir=wd, fileext=".html")
-    writeLines(as.character(html), htmlfile)
+    writeLines(as.character(html$doc), htmlfile)
     ## Run PhantomJS to get the layout
     phantomjs <- Sys.which("phantomjs")
     ## Ensure that PhantomJS can see the font files
