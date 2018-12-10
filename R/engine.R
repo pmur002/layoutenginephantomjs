@@ -42,7 +42,7 @@ phantomjsLayout <- function(html, width, height, fonts, device) {
     ## Convert font size from CSS pixels to points
     layoutDF$size <- layoutDF$size*72/dpi
     ## Break text if necessary
-    do.call(makeLayout, unname(layoutDF))
+    do.call(makeLayout, layoutDF)
 }
 
 phantomjsEngine <- makeEngine(phantomjsLayout)
