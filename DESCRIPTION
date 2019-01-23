@@ -1,7 +1,7 @@
 Package: layoutEnginePhantomJS
 Type: Package
 Title: Render HTML Using PhantomJS
-Version: 0.1-0
+Version: 0.1-1
 Authors@R: c(person("Paul", "Murrell", 
                     role=c("aut", "cre"),
                     email="paul@stat.auckland.ac.nz"),
@@ -9,7 +9,7 @@ Authors@R: c(person("Paul", "Murrell",
                     role=c("ctb", "cph")))
 Description: A "backend" package for 'layoutEngine' that is based on 
              PhantomJS.
-Depends: layoutEngine
+Depends: layoutEngine (>= 0.1-1)
 SystemRequirements: PhantomJS
 Suggests: gyre, xtable
 License: GPL-3

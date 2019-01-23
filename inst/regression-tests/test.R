@@ -17,6 +17,8 @@ tests <- function() {
               just=c("right", "top"))
     grid.newpage()
     grid.html('<p style="width: 100px; border-width: 1px; border-style: solid">This paragraph should split a line</p>')
+    grid.newpage()
+    grid.html('<ul><li>a</li><li>simple</li><li>list</li></ul>')
 }
 
 pdf("tests.pdf")
@@ -37,6 +39,12 @@ testoutput <- function(basename) {
     modelFiles <- list.files(pattern="model-pages-.*[.]pdf")
     N <- length(modelFiles)
     allGood <- TRUE
+    testFiles <- list.files(pattern="test-pages-.*[.]pdf")
+    if (length(testFiles) != N) {
+        cat(sprintf("Number of test pages (%d) and model pages (%d) differ\n",
+                    length(testFiles), N))
+        allGood <- FALSE
+    }
     for (i in 1:N) {
         system(paste0("convert -density 96 ",
                       "model-pages-", i, ".pdf ",
